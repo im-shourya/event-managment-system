@@ -37,7 +37,7 @@ export default function EventsList() {
           <p className="text-gray-400">Discover and register for club events.</p>
         </div>
         <div className="flex gap-4">
-          <Link href="/dashboard" className="btn-outline text-sm">
+          <Link href="/" className="btn-outline text-sm">
             Back to Dashboard
           </Link>
           <Link href="/events/create" className="btn-primary text-sm">

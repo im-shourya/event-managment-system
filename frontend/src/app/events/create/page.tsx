@@ -87,7 +87,7 @@ export default function CreateEvent() {
   return (
     <div className="min-h-screen p-8 max-w-3xl mx-auto flex flex-col justify-center">
       <div className="mb-8">
-        <Link href="/dashboard" className="text-gray-400 hover:text-accent-green transition-colors">
+        <Link href="/" className="text-gray-400 hover:text-accent-green transition-colors">
           &larr; Back to Dashboard
         </Link>
       </div>

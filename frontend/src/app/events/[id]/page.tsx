@@ -318,7 +318,7 @@ export default function EventDetails() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[300px] bg-accent-green/5 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
 
       <div className="mb-8 flex justify-between items-center">
-        <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-accent-green transition-colors w-fit">
+        <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-accent-green transition-colors w-fit">
           <ArrowLeft size={16} /> Back to Dashboard
         </Link>
         {isAdmin && (

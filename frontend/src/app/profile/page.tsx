@@ -82,7 +82,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen p-8 max-w-2xl mx-auto flex flex-col justify-start">
       <div className="mb-8">
-        <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-accent-green transition-colors w-fit">
+        <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-accent-green transition-colors w-fit">
           <ArrowLeft size={16} /> Back to Dashboard
         </Link>
       </div>

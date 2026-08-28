@@ -39,7 +39,7 @@ export default function UpdatePassword() {
     } else {
       setMessage({ type: "success", text: "Password updated successfully! Redirecting..." });
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/");
       }, 2000);
     }
     setLoading(false);

@@ -20,7 +20,7 @@ export default function Login() {
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setError(error.message);
-      else router.push("/dashboard");
+      else router.push("/");
     } else {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) setError(error.message);
@@ -28,7 +28,7 @@ export default function Login() {
         // Automatically sync to backend users table could go here, or we use Supabase database triggers.
         // For simplicity, we just push to dashboard if successful
         if (data.user) {
-          router.push("/dashboard");
+          router.push("/");
         }
       }
     }

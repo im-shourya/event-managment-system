@@ -139,19 +139,19 @@ export default function Dashboard() {
                 <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2 group-hover:text-accent-green transition-colors">
                   <Calendar size={16} /> Total Events
                 </h3>
-                <p className="text-4xl md:text-5xl font-extrabold text-white mt-2">{stats.totalEvents}</p>
+                <p className="text-4xl md:text-5xl font-extrabold text-white mt-2">{hostedEvents.length}</p>
               </div>
               <div className="glass-card p-6 rounded-3xl group">
                 <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2 group-hover:text-accent-green transition-colors">
                   <Users size={16} /> Total Registrations
                 </h3>
-                <p className="text-4xl md:text-5xl font-extrabold text-white mt-2">{stats.totalRegistrations}</p>
+                <p className="text-4xl md:text-5xl font-extrabold text-white mt-2">{totalRegistrations}</p>
               </div>
               <div className="glass-card p-6 rounded-3xl group">
                 <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2 group-hover:text-accent-green transition-colors">
                   <CheckCircle size={16} /> Total Present
                 </h3>
-                <p className="text-4xl md:text-5xl font-extrabold text-white mt-2">{stats.totalPresent}</p>
+                <p className="text-4xl md:text-5xl font-extrabold text-white mt-2">{totalPresent}</p>
               </div>
             </div>
 

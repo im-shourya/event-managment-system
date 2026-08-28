@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Event Manager | Premium Club Platform",
+  title: "Event Manager Platform",
   description: "The ultimate platform for student clubs to manage events, registrations, and QR attendance.",
 };
 

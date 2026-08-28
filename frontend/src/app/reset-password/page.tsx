@@ -18,7 +18,7 @@ export default function ResetPassword() {
     setLoading(true);
     setMessage(null);
 
-    const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000";
+    const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://events.shouryaparashar.in' : 'http://localhost:3000');
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${FRONTEND_URL}/update-password`,

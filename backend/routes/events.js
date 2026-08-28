@@ -254,7 +254,7 @@ router.post('/:id/mass-mail', async (req, res) => {
   // 2. Prepare Resend Batch payload
   if (!resend) return res.status(500).json({ error: "Resend is not configured." });
 
-  const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const FRONTEND_URL = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://events.shouryaparashar.in' : 'http://localhost:3000');
 
   // Limit to Resend's batch limits (100 per batch)
   const batchEmails = participants.slice(0, 100).map(p => {
@@ -343,7 +343,7 @@ router.put('/:id', async (req, res) => {
     const { data: participants } = await supabase.from('registrations').select('users(email, name)').eq('event_id', id);
     
     if (participants && participants.length > 0) {
-      const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const FRONTEND_URL = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://events.shouryaparashar.in' : 'http://localhost:3000');
       const eventUrl = `${FRONTEND_URL}/events/${id}`;
       
       const batchEmails = participants.slice(0, 100).map(p => ({

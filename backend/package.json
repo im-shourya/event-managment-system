@@ -15,6 +15,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "qrcode": "^1.5.4",
-    "resend": "^6.24.0"
+    "resend": "^6.24.0",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }

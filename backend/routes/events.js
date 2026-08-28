@@ -3,6 +3,88 @@ const { supabase, getAuthClient } = require('../supabaseClient');
 const { Resend } = require('resend');
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/events:
+ *   get:
+ *     summary: Retrieve a list of all events
+ *     responses:
+ *       200:
+ *         description: A list of events.
+ *   post:
+ *     summary: Create a new event
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title: { type: string }
+ *               description: { type: string }
+ *               start_time: { type: string, format: date-time }
+ *               end_time: { type: string, format: date-time }
+ *     responses:
+ *       201:
+ *         description: Event created
+ *
+ * /api/events/{id}:
+ *   get:
+ *     summary: Get event details
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Event details
+ *   put:
+ *     summary: Edit event and notify participants
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title: { type: string }
+ *               description: { type: string }
+ *               start_time: { type: string, format: date-time }
+ *               end_time: { type: string, format: date-time }
+ *               status: { type: string, enum: [upcoming, ongoing, completed] }
+ *               notifyParticipants: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Event updated
+ * 
+ * /api/events/{id}/register:
+ *   post:
+ *     summary: Register for an event
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       201:
+ *         description: Registration successful
+ */
+
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Get all events

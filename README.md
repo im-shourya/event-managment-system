@@ -1,6 +1,6 @@
 # Club Event Management System
 
-An ultra-premium, full-stack event management platform built for student clubs. It features a complete Next.js frontend, an Express/Supabase backend, seamless magic-link authentication, and robust admin tools including QR code attendance tracking and automated email blasts.
+A full-stack event management platform built for student clubs. It features a complete Next.js frontend, an Express/Supabase backend, seamless magic-link authentication, and robust admin tools including QR code attendance tracking and automated email blasts.
 
 ## Features
 - **User Authentication**: Secure magic-link & OTP login via Supabase.

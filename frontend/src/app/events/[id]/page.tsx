@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
-import { Calendar, Clock, Users, CheckCircle, Download, ArrowLeft, Mail, Building, GraduationCap, Hash, BookOpen, AlertTriangle, Send, Edit, MessageSquare, Star } from "lucide-react";
+import { Calendar, Clock, Users, CheckCircle, Download, ArrowLeft, Mail, Building, GraduationCap, Hash, BookOpen, AlertTriangle, Send, Edit, MessageSquare, Star, Globe, QrCode } from "lucide-react";
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -17,6 +17,7 @@ export default function EventDetails() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isAlreadyRegistered, setIsAlreadyRegistered] = useState(false);
   const [isMarkedPresent, setIsMarkedPresent] = useState(false);
+  const [myQrCodeUrl, setMyQrCodeUrl] = useState<string | null>(null);
 
   // Admin specific states
   const [isAdmin, setIsAdmin] = useState(false);
@@ -43,6 +44,11 @@ export default function EventDetails() {
   const [feedbackComments, setFeedbackComments] = useState("");
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [hasSubmittedFeedback, setHasSubmittedFeedback] = useState(false);
+
+  // QR Modal States
+  const [qrModalData, setQrModalData] = useState<{ registrationId: string } | null>(null);
+  const [qrSendEmail, setQrSendEmail] = useState(false);
+  const [generatingQr, setGeneratingQr] = useState(false);
 
   const router = useRouter();
   const supabase = createClient();
@@ -92,7 +98,7 @@ export default function EventDetails() {
             // 4. If student, check registration and feedback status
             const { data: myReg } = await supabase
               .from("registrations")
-              .select("id, attendance_status")
+              .select("id, attendance_status, qr_code_url")
               .eq("event_id", id)
               .eq("user_id", user.id)
               .single();
@@ -100,6 +106,7 @@ export default function EventDetails() {
             if (myReg) {
               setIsAlreadyRegistered(true);
               setIsMarkedPresent(myReg.attendance_status);
+              setMyQrCodeUrl(myReg.qr_code_url);
             }
 
             const { data: myFb } = await supabase
@@ -263,6 +270,40 @@ export default function EventDetails() {
     setSubmittingFeedback(false);
   };
 
+  const handleGenerateQRSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!qrModalData) return;
+    setGeneratingQr(true);
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:3001";
+      const res = await fetch(`${backendUrl}/api/events/${id}/registrations/${qrModalData.registrationId}/generate-qr`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ sendEmail: qrSendEmail })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Update local registrations state
+        setRegistrations(prev => prev.map(reg => reg.id === qrModalData.registrationId ? { ...reg, qr_code_url: data.qrCodeUrl } : reg));
+        alert("QR generated successfully.");
+        setQrModalData(null);
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to generate QR.");
+      }
+    } catch (err) {
+      alert("An unexpected error occurred.");
+    } finally {
+      setGeneratingQr(false);
+    }
+  };
+
   const filteredRegistrations = filter === "all" ? registrations : registrations.filter(r => r.attendance_status === true);
 
   const downloadCSV = () => {
@@ -331,15 +372,24 @@ export default function EventDetails() {
       <div className="glass-card p-8 rounded-3xl w-full relative overflow-hidden mb-8">
         <div className="absolute top-0 right-0 w-64 h-64 bg-accent-green/10 rounded-full blur-[80px] -z-10 translate-x-1/2 -translate-y-1/2"></div>
         
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-          <h1 className="text-4xl font-extrabold text-neon">{event.title}</h1>
-          <span className={`text-xs uppercase font-bold px-3 py-1 rounded-full border w-fit ${
-            event.status === 'upcoming' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
-            event.status === 'ongoing' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' :
-            'bg-gray-500/10 text-gray-400 border-gray-500/30'
-          }`}>
-            {event.status}
-          </span>
+        {event.banner_url && (
+          <img src={event.banner_url} alt="Event Banner" className="w-full h-48 md:h-64 object-cover rounded-2xl mb-8 border border-surface-border shadow-lg" />
+        )}
+        
+        <div className="flex flex-col md:flex-row md:items-center gap-6 mb-6">
+          {event.poster_url && (
+            <img src={event.poster_url} alt="Event Poster" className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-2xl border border-surface-border shadow-md" />
+          )}
+          <div>
+            <h1 className="text-4xl font-extrabold text-neon mb-2">{event.title}</h1>
+            <span className={`text-xs uppercase font-bold px-3 py-1 rounded-full border w-fit inline-block ${
+              event.status === 'upcoming' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
+              event.status === 'ongoing' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' :
+              'bg-gray-500/10 text-gray-400 border-gray-500/30'
+            }`}>
+              {event.status}
+            </span>
+          </div>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-8 text-sm text-gray-300 mb-8 pb-8 border-b border-surface-border">
@@ -361,6 +411,28 @@ export default function EventDetails() {
               <p>{new Date(event.end_time).toLocaleString()}</p>
             </div>
           </div>
+          {event.team_size > 1 && (
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+                <Users size={20} />
+              </div>
+              <div>
+                <p className="font-bold text-white mb-1">Team Size</p>
+                <p>{event.team_size} members</p>
+              </div>
+            </div>
+          )}
+          {event.external_link && (
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+                <Globe size={20} />
+              </div>
+              <div>
+                <p className="font-bold text-white mb-1">Link</p>
+                <a href={event.external_link} target="_blank" rel="noreferrer" className="text-accent-green hover:underline break-all line-clamp-1">{event.external_link}</a>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mb-10">
@@ -369,6 +441,20 @@ export default function EventDetails() {
             {event.description || "No description provided."}
           </p>
         </div>
+
+        {event.faq && event.faq.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-xl font-bold mb-4 text-white">Frequently Asked Questions</h2>
+            <div className="flex flex-col gap-4">
+              {event.faq.map((f: any, idx: number) => (
+                <div key={idx} className="bg-surface/50 border border-surface-border rounded-xl p-4">
+                  <h3 className="font-bold text-white mb-2">{f.question}</h3>
+                  <p className="text-gray-400 text-sm">{f.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Hide Register button if user is Admin */}
         {!isAdmin && (
@@ -398,6 +484,16 @@ export default function EventDetails() {
             >
               {registering ? "Registering..." : (isAlreadyRegistered ? <><CheckCircle size={20}/> Registered</> : (event.status === 'completed' ? "Registration Closed" : "Register Now"))}
             </button>
+
+            {isAlreadyRegistered && myQrCodeUrl && (
+              <div className="mt-8 p-6 bg-surface border border-surface-border rounded-2xl flex flex-col items-center text-center w-full max-w-sm mx-auto shadow-[0_0_20px_rgba(0,230,118,0.1)]">
+                <h3 className="text-lg font-bold text-white mb-2">Your Check-In QR Pass</h3>
+                <p className="text-gray-400 text-sm mb-4">Show this code at the event entrance.</p>
+                <div className="bg-white p-2 rounded-xl">
+                  <img src={myQrCodeUrl} alt="Check-In QR" className="w-48 h-48" />
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -568,6 +664,19 @@ export default function EventDetails() {
                                   </span>
                                 )}
                                 <span className="text-xs text-gray-600 ml-1">{new Date(reg.registered_at).toLocaleDateString()}</span>
+                                {!reg.qr_code_url && (
+                                  <button 
+                                    onClick={() => setQrModalData({ registrationId: reg.id })}
+                                    className="text-xs text-accent-green hover:underline mt-1 font-bold flex items-center gap-1 bg-surface px-2 py-1 rounded border border-surface-border"
+                                  >
+                                    <QrCode size={12} /> Generate QR
+                                  </button>
+                                )}
+                                {reg.qr_code_url && (
+                                  <span className="text-xs text-blue-400 mt-1 font-bold flex items-center gap-1">
+                                    <CheckCircle size={12} /> QR Ready
+                                  </span>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -801,6 +910,45 @@ export default function EventDetails() {
                 </button>
                 <button type="submit" disabled={sendingMail} className="btn-primary flex-1 flex justify-center items-center gap-2">
                   {sendingMail ? "Sending..." : <><Send size={18}/> Send Mail</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Generate QR Modal */}
+      {qrModalData && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass-card p-8 rounded-3xl w-full max-w-sm border border-surface-border">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-neon flex items-center gap-2">
+                <QrCode size={20} /> Generate QR
+              </h2>
+              <button onClick={() => setQrModalData(null)} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            
+            <form onSubmit={handleGenerateQRSubmit} className="flex flex-col gap-5">
+              <div className="flex items-center gap-3 bg-surface p-3 rounded-lg border border-surface-border mt-2">
+                <input 
+                  type="checkbox" 
+                  id="sendEmailCheck" 
+                  checked={qrSendEmail}
+                  onChange={(e) => setQrSendEmail(e.target.checked)}
+                  className="w-4 h-4 accent-accent-green cursor-pointer"
+                />
+                <label htmlFor="sendEmailCheck" className="text-white text-sm cursor-pointer select-none">
+                  Email QR code to participant
+                </label>
+              </div>
+              <p className="text-xs text-gray-400">If unchecked, the QR code will only be updated in their registration portal.</p>
+
+              <div className="flex gap-4 mt-2">
+                <button type="button" onClick={() => setQrModalData(null)} className="btn-outline flex-1 text-sm">
+                  Cancel
+                </button>
+                <button type="submit" disabled={generatingQr} className="btn-primary flex-1 text-sm">
+                  {generatingQr ? "Generating..." : "Generate"}
                 </button>
               </div>
             </form>

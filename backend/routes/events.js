@@ -89,7 +89,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 // Get all events
 router.get('/', async (req, res) => {
-  const { data, error } = await supabase.from('events').select('*');
+  const { data, error } = await supabase.from('events').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
@@ -125,7 +125,8 @@ router.get('/hosted/:userId', async (req, res) => {
         attendance_status
       )
     `)
-    .eq('created_by', userId);
+    .eq('created_by', userId)
+    .order('created_at', { ascending: false });
 
   if (error) return res.status(500).json({ error: error.message });
   
@@ -155,7 +156,7 @@ router.get('/:id', async (req, res) => {
 
 // Create an event
 router.post('/', async (req, res) => {
-  const { title, description, start_time, end_time, created_by } = req.body;
+  const { title, description, start_time, end_time, created_by, poster_url, banner_url, faq, team_size, external_link } = req.body;
   
   // Use authenticated client so RLS (auth.uid() = created_by) passes
   const authClient = getAuthClient(req.headers.authorization);
@@ -164,7 +165,7 @@ router.post('/', async (req, res) => {
 
   const { data, error } = await authClient
     .from('events')
-    .insert([{ title, description, start_time, end_time, created_by, qr_code_data }])
+    .insert([{ title, description, start_time, end_time, created_by, qr_code_data, poster_url, banner_url, faq, team_size, external_link }])
     .select();
 
   if (error) return res.status(500).json({ error: error.message });
@@ -182,6 +183,7 @@ router.get('/:id/registrations', async (req, res) => {
       id,
       attendance_status,
       registered_at,
+      qr_code_url,
       users ( id, email, name, register_number, year, department, college )
     `)
     .eq('event_id', id);
@@ -316,7 +318,7 @@ router.post('/:id/checkin/:registrationId', async (req, res) => {
 // Update an event (Admin only)
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { title, description, start_time, end_time, status, notifyParticipants } = req.body;
+  const { title, description, start_time, end_time, status, notifyParticipants, poster_url, banner_url, faq, team_size, external_link } = req.body;
   const authClient = getAuthClient(req.headers.authorization);
 
   // 1. Get current user
@@ -331,7 +333,7 @@ router.put('/:id', async (req, res) => {
   // 3. Update Event
   const { data: updatedEvent, error: updateError } = await authClient
     .from('events')
-    .update({ title, description, start_time, end_time, status })
+    .update({ title, description, start_time, end_time, status, poster_url, banner_url, faq, team_size, external_link })
     .eq('id', id)
     .select()
     .single();
@@ -365,6 +367,65 @@ router.put('/:id', async (req, res) => {
   }
 
   return res.json(updatedEvent);
+});
+
+// Generate QR code for a specific registration
+router.post('/:id/registrations/:registrationId/generate-qr', async (req, res) => {
+  const { id, registrationId } = req.params;
+  const { sendEmail } = req.body;
+  const authClient = getAuthClient(req.headers.authorization);
+
+  // Verify Admin
+  const { data: { user }, error: authError } = await authClient.auth.getUser();
+  if (authError || !user) return res.status(401).json({ error: "Unauthorized" });
+
+  const { data: event, error: eventError } = await authClient.from('events').select('created_by, title').eq('id', id).single();
+  if (eventError || !event) return res.status(404).json({ error: "Event not found." });
+  if (event.created_by !== user.id) return res.status(403).json({ error: "Only the admin can generate QR codes." });
+
+  // Check Registration
+  const { data: registration, error: regError } = await authClient
+    .from('registrations')
+    .select('id, users(email, name)')
+    .eq('id', registrationId)
+    .eq('event_id', id)
+    .single();
+
+  if (regError || !registration) return res.status(404).json({ error: "Registration not found." });
+
+  // Generate QR Url
+  const FRONTEND_URL = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://events.shouryaparashar.in' : 'http://localhost:3000');
+  const checkinUrl = `${FRONTEND_URL}/events/${id}/checkin/${registration.id}`;
+  const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(checkinUrl)}&size=300`;
+
+  // Update Registration
+  const { error: updateRegError } = await authClient
+    .from('registrations')
+    .update({ qr_code_url: qrCodeUrl })
+    .eq('id', registrationId);
+
+  if (updateRegError) return res.status(500).json({ error: updateRegError.message });
+
+  // Send Email
+  if (sendEmail && resend && registration.users) {
+    try {
+      await resend.emails.send({
+        from: 'Club Events <events@shouryaparashar.in>',
+        to: registration.users.email,
+        subject: `Your QR Code Pass for ${event.title}`,
+        html: `<p>Hi ${registration.users.name},</p>
+               <p>Here is your unique QR code for <strong>${event.title}</strong>.</p>
+               <p>Please present this code at the check-in desk.</p>
+               <img src="${qrCodeUrl}" alt="QR Code" />
+               <p>See you there!</p>`,
+      });
+    } catch (err) {
+      console.error("Email error:", err);
+      // Even if email fails, the QR is generated successfully
+    }
+  }
+
+  return res.json({ message: "QR generated successfully", qrCodeUrl });
 });
 
 module.exports = router;

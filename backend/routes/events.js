@@ -428,4 +428,75 @@ router.post('/:id/registrations/:registrationId/generate-qr', async (req, res) =
   return res.json({ message: "QR generated successfully", qrCodeUrl });
 });
 
+// Generate QR code for ALL registrations without one
+router.post('/:id/registrations/generate-all-qrs', async (req, res) => {
+  const { id } = req.params;
+  const { sendEmail } = req.body;
+  const authClient = getAuthClient(req.headers.authorization);
+
+  // Verify Admin
+  const { data: { user }, error: authError } = await authClient.auth.getUser();
+  if (authError || !user) return res.status(401).json({ error: "Unauthorized" });
+
+  const { data: event, error: eventError } = await authClient.from('events').select('created_by, title').eq('id', id).single();
+  if (eventError || !event) return res.status(404).json({ error: "Event not found." });
+  if (event.created_by !== user.id) return res.status(403).json({ error: "Only the admin can generate QR codes." });
+
+  // Get all registrations without QR codes
+  const { data: registrations, error: regError } = await authClient
+    .from('registrations')
+    .select('id, users(email, name)')
+    .eq('event_id', id)
+    .is('qr_code_url', null);
+
+  if (regError) return res.status(500).json({ error: regError.message });
+  if (!registrations || registrations.length === 0) return res.json({ message: "All registrations already have QR codes.", count: 0 });
+
+  const FRONTEND_URL = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://events.shouryaparashar.in' : 'http://localhost:3000');
+  let generatedCount = 0;
+  
+  // Prepare batch emails
+  const batchEmails = [];
+
+  for (const reg of registrations) {
+    const checkinUrl = `${FRONTEND_URL}/events/${id}/checkin/${reg.id}`;
+    const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(checkinUrl)}&size=300`;
+
+    const { error: updateRegError } = await authClient
+      .from('registrations')
+      .update({ qr_code_url: qrCodeUrl })
+      .eq('id', reg.id);
+      
+    if (!updateRegError) {
+      generatedCount++;
+      if (sendEmail && resend && reg.users) {
+        batchEmails.push({
+          from: 'Club Events <events@shouryaparashar.in>',
+          to: reg.users.email,
+          subject: `Your QR Code Pass for ${event.title}`,
+          html: `<p>Hi ${reg.users.name},</p>
+                 <p>Here is your unique QR code for <strong>${event.title}</strong>.</p>
+                 <p>Please present this code at the check-in desk.</p>
+                 <img src="${qrCodeUrl}" alt="QR Code" />
+                 <p>See you there!</p>`,
+        });
+      }
+    }
+  }
+
+  // Send batch emails if any
+  if (batchEmails.length > 0) {
+    for (let i = 0; i < batchEmails.length; i += 100) {
+      const batch = batchEmails.slice(i, i + 100);
+      try {
+        await resend.batch.send(batch);
+      } catch (err) {
+        console.error("Batch email error:", err);
+      }
+    }
+  }
+
+  return res.json({ message: `Successfully generated ${generatedCount} QR codes.`, count: generatedCount });
+});
+
 module.exports = router;

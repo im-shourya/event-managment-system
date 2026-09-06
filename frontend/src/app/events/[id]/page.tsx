@@ -276,26 +276,60 @@ export default function EventDetails() {
     setGeneratingQr(true);
     
     const { data: { session } } = await supabase.auth.getSession();
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:3001";
+    
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:3001";
-      const res = await fetch(`${backendUrl}/api/events/${id}/registrations/${qrModalData.registrationId}/generate-qr`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session?.access_token}`
-        },
-        body: JSON.stringify({ sendEmail: qrSendEmail })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        // Update local registrations state
-        setRegistrations(prev => prev.map(reg => reg.id === qrModalData.registrationId ? { ...reg, qr_code_url: data.qrCodeUrl } : reg));
-        alert("QR generated successfully.");
-        setQrModalData(null);
+      if (qrModalData.registrationId === 'ALL') {
+        const res = await fetch(`${backendUrl}/api/events/${id}/registrations/generate-all-qrs`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token}`
+          },
+          body: JSON.stringify({ sendEmail: qrSendEmail })
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          // Refresh local registrations
+          const regRes = await supabase
+            .from('registrations')
+            .select(`
+              id,
+              attendance_status,
+              registered_at,
+              qr_code_url,
+              users ( id, email, name, register_number, year, department, college )
+            `)
+            .eq('event_id', id);
+          if (regRes.data) setRegistrations(regRes.data);
+          
+          alert(data.message || "Bulk QR generated successfully.");
+          setQrModalData(null);
+        } else {
+          const err = await res.json();
+          alert(err.error || "Failed to generate QRs.");
+        }
       } else {
-        const err = await res.json();
-        alert(err.error || "Failed to generate QR.");
+        const res = await fetch(`${backendUrl}/api/events/${id}/registrations/${qrModalData.registrationId}/generate-qr`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token}`
+          },
+          body: JSON.stringify({ sendEmail: qrSendEmail })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          // Update local registrations state
+          setRegistrations(prev => prev.map(reg => reg.id === qrModalData.registrationId ? { ...reg, qr_code_url: data.qrCodeUrl } : reg));
+          alert("QR generated successfully.");
+          setQrModalData(null);
+        } else {
+          const err = await res.json();
+          alert(err.error || "Failed to generate QR.");
+        }
       }
     } catch (err) {
       alert("An unexpected error occurred.");
@@ -575,6 +609,12 @@ export default function EventDetails() {
                     className="btn-primary text-sm flex items-center gap-2 py-2 px-4 bg-accent-green text-black hover:bg-accent-green/90"
                   >
                     <Mail size={16} /> Send Mass Email
+                  </button>
+                  <button 
+                    onClick={() => setQrModalData({ registrationId: 'ALL' })}
+                    className="btn-outline text-sm flex items-center gap-2 py-2 px-4 border-accent-green text-accent-green hover:bg-accent-green hover:text-black"
+                  >
+                    <QrCode size={16} /> Generate All QRs
                   </button>
                   <button 
                     onClick={downloadCSV}
@@ -923,7 +963,7 @@ export default function EventDetails() {
           <div className="glass-card p-8 rounded-3xl w-full max-w-sm border border-surface-border">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-neon flex items-center gap-2">
-                <QrCode size={20} /> Generate QR
+                <QrCode size={20} /> {qrModalData.registrationId === 'ALL' ? 'Generate All QRs' : 'Generate QR'}
               </h2>
               <button onClick={() => setQrModalData(null)} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
             </div>

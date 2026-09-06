@@ -12,6 +12,10 @@ export default function CreateEvent() {
   const [endTime, setEndTime] = useState("");
   const [teamSize, setTeamSize] = useState(1);
   const [externalLink, setExternalLink] = useState("");
+  const [location, setLocation] = useState("");
+  const [eventType, setEventType] = useState("offline");
+  const [mapUrl, setMapUrl] = useState("");
+  const [prizePool, setPrizePool] = useState("");
   
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
@@ -115,7 +119,11 @@ export default function CreateEvent() {
           external_link: externalLink,
           poster_url,
           banner_url,
-          faq: faqs
+          faq: faqs,
+          location,
+          event_type: eventType,
+          map_url: mapUrl,
+          prize_pool: prizePool
         }),
       });
 
@@ -154,104 +162,170 @@ export default function CreateEvent() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Event Title</label>
-            <input
-              type="text"
-              className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
-            <textarea
-              className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors min-h-[100px]"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+          
+          {/* Basic Info */}
+          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
+            <h2 className="text-xl font-bold text-neon mb-2">1. Basic Info</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Start Time</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Event Title</label>
               <input
-                type="datetime-local"
+                type="text"
                 className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 required
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">End Time</label>
-              <input
-                type="datetime-local"
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
+              <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
+              <textarea
+                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors min-h-[100px]"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 required
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Team Size</label>
-              <input
-                type="number"
-                min="1"
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
-                value={teamSize}
-                onChange={(e) => setTeamSize(parseInt(e.target.value))}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">External Link (Optional)</label>
-              <input
-                type="url"
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
-                value={externalLink}
-                onChange={(e) => setExternalLink(e.target.value)}
-                placeholder="https://"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Poster Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
-                onChange={(e) => setPosterFile(e.target.files?.[0] || null)}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Banner Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
-                onChange={(e) => setBannerFile(e.target.files?.[0] || null)}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Start Time</label>
+                <input
+                  type="datetime-local"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">End Time</label>
+                <input
+                  type="datetime-local"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
+                />
+              </div>
             </div>
           </div>
 
-          <div>
+          {/* Logistics */}
+          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
+            <h2 className="text-xl font-bold text-neon mb-2">2. Logistics</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Event Type</label>
+                <select
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  value={eventType}
+                  onChange={(e) => setEventType(e.target.value)}
+                >
+                  <option value="offline">Offline / In-Person</option>
+                  <option value="online">Online / Virtual</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Location / Platform</label>
+                <input
+                  type="text"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder={eventType === 'offline' ? "e.g., Main Auditorium" : "e.g., Zoom"}
+                />
+              </div>
+            </div>
+            {eventType === 'offline' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Map Embed URL (Optional)</label>
+                <input
+                  type="url"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  value={mapUrl}
+                  onChange={(e) => setMapUrl(e.target.value)}
+                  placeholder="https://www.google.com/maps/embed?..."
+                />
+                <p className="text-xs text-gray-500 mt-1">Provide an embed URL (src) to display a map on the event page.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Additional Details */}
+          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
+            <h2 className="text-xl font-bold text-neon mb-2">3. Additional Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Team Size</label>
+                <input
+                  type="number"
+                  min="1"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  value={teamSize}
+                  onChange={(e) => setTeamSize(parseInt(e.target.value))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Prize Pool (Optional)</label>
+                <input
+                  type="text"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  value={prizePool}
+                  onChange={(e) => setPrizePool(e.target.value)}
+                  placeholder="e.g., ₹10,000"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">External Link (Optional)</label>
+                <input
+                  type="url"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  value={externalLink}
+                  onChange={(e) => setExternalLink(e.target.value)}
+                  placeholder="https://"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Media */}
+          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
+            <h2 className="text-xl font-bold text-neon mb-2">4. Media</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Poster Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  onChange={(e) => setPosterFile(e.target.files?.[0] || null)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Banner Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  onChange={(e) => setBannerFile(e.target.files?.[0] || null)}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* FAQs */}
+          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-medium text-gray-400">FAQs</label>
-              <button type="button" onClick={handleAddFaq} className="text-xs text-accent-green border border-accent-green rounded px-2 py-1">
+              <h2 className="text-xl font-bold text-neon">5. FAQs</h2>
+              <button type="button" onClick={handleAddFaq} className="text-xs text-accent-green border border-accent-green rounded px-2 py-1 hover:bg-accent-green hover:text-black transition-colors">
                 + Add FAQ
               </button>
             </div>
+            {faqs.length === 0 && <p className="text-sm text-gray-500">No FAQs added.</p>}
             {faqs.map((faq, index) => (
-              <div key={index} className="flex flex-col gap-2 mb-4 p-4 border border-surface-border rounded-lg bg-surface/50">
+              <div key={index} className="flex flex-col gap-2 p-4 border border-surface-border rounded-lg bg-surface/50">
                 <input
                   type="text"
                   placeholder="Question"
@@ -267,14 +341,14 @@ export default function CreateEvent() {
                   onChange={(e) => handleUpdateFaq(index, "answer", e.target.value)}
                   required
                 />
-                <button type="button" onClick={() => handleRemoveFaq(index)} className="text-red-400 text-xs self-end">
-                  Remove
+                <button type="button" onClick={() => handleRemoveFaq(index)} className="text-red-400 text-xs self-end hover:underline">
+                  Remove FAQ
                 </button>
               </div>
             ))}
           </div>
 
-          <button type="submit" className="btn-primary w-full mt-6" disabled={loading}>
+          <button type="submit" className="btn-primary w-full mt-4 py-4 text-lg font-bold" disabled={loading}>
             {loading ? "Creating Event..." : "Create Event"}
           </button>
         </form>

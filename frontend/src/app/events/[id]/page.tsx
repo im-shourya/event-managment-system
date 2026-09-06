@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
-import { Calendar, Clock, Users, CheckCircle, Download, ArrowLeft, Mail, Building, GraduationCap, Hash, BookOpen, AlertTriangle, Send, Edit, MessageSquare, Star, Globe, QrCode } from "lucide-react";
+import { Calendar, Clock, Users, CheckCircle, Download, ArrowLeft, Mail, Building, GraduationCap, Hash, BookOpen, AlertTriangle, Send, Edit, MessageSquare, Star, Globe, QrCode, MapPin, Trophy, Monitor, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -18,6 +18,7 @@ export default function EventDetails() {
   const [isAlreadyRegistered, setIsAlreadyRegistered] = useState(false);
   const [isMarkedPresent, setIsMarkedPresent] = useState(false);
   const [myQrCodeUrl, setMyQrCodeUrl] = useState<string | null>(null);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   // Admin specific states
   const [isAdmin, setIsAdmin] = useState(false);
@@ -38,6 +39,8 @@ export default function EventDetails() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
   const [savingEdit, setSavingEdit] = useState(false);
+  const [editPosterFile, setEditPosterFile] = useState<File | null>(null);
+  const [editBannerFile, setEditBannerFile] = useState<File | null>(null);
 
   // Student Feedback States
   const [feedbackRating, setFeedbackRating] = useState(5);
@@ -69,6 +72,13 @@ export default function EventDetails() {
             start_time: data.start_time.slice(0, 16), // datetime-local format
             end_time: data.end_time.slice(0, 16),
             status: data.status,
+            team_size: data.team_size || 1,
+            external_link: data.external_link || "",
+            location: data.location || "",
+            event_type: data.event_type || "offline",
+            map_url: data.map_url || "",
+            prize_pool: data.prize_pool || "",
+            faq: data.faq || [],
             notifyParticipants: false
           });
         } else {
@@ -218,6 +228,21 @@ export default function EventDetails() {
     const { data: { session } } = await supabase.auth.getSession();
     
     try {
+      let poster_url = event.poster_url;
+      let banner_url = event.banner_url;
+
+      const uploadImage = async (file: File) => {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { error } = await supabase.storage.from('event-images').upload(fileName, file);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('event-images').getPublicUrl(fileName);
+        return publicUrl;
+      };
+
+      if (editPosterFile) poster_url = await uploadImage(editPosterFile);
+      if (editBannerFile) banner_url = await uploadImage(editBannerFile);
+
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:3001";
       const res = await fetch(`${backendUrl}/api/events/${id}`, {
         method: "PUT",
@@ -227,6 +252,8 @@ export default function EventDetails() {
         },
         body: JSON.stringify({
           ...editForm,
+          poster_url,
+          banner_url,
           start_time: new Date(editForm.start_time).toISOString(),
           end_time: new Date(editForm.end_time).toISOString(),
         }),
@@ -416,17 +443,24 @@ export default function EventDetails() {
           )}
           <div>
             <h1 className="text-4xl font-extrabold text-neon mb-2">{event.title}</h1>
-            <span className={`text-xs uppercase font-bold px-3 py-1 rounded-full border w-fit inline-block ${
-              event.status === 'upcoming' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
-              event.status === 'ongoing' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' :
-              'bg-gray-500/10 text-gray-400 border-gray-500/30'
-            }`}>
-              {event.status}
-            </span>
+            <div className="flex gap-3 flex-wrap">
+              <span className={`text-xs uppercase font-bold px-3 py-1 rounded-full border w-fit inline-block ${
+                event.status === 'upcoming' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
+                event.status === 'ongoing' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' :
+                'bg-gray-500/10 text-gray-400 border-gray-500/30'
+              }`}>
+                {event.status}
+              </span>
+              {event.prize_pool && (
+                <span className="text-xs uppercase font-bold px-3 py-1 rounded-full border border-yellow-500/50 bg-yellow-500/20 text-yellow-300 flex items-center gap-1 shadow-[0_0_10px_rgba(234,179,8,0.3)]">
+                  <Trophy size={14} /> {event.prize_pool}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-8 text-sm text-gray-300 mb-8 pb-8 border-b border-surface-border">
+        <div className="flex flex-col sm:flex-row gap-8 text-sm text-gray-300 mb-8 pb-8 border-b border-surface-border flex-wrap">
           <div className="flex items-start gap-3">
             <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
               <Calendar size={20} />
@@ -445,6 +479,26 @@ export default function EventDetails() {
               <p>{new Date(event.end_time).toLocaleString()}</p>
             </div>
           </div>
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+              {event.event_type === 'online' ? <Monitor size={20} /> : <Building size={20} />}
+            </div>
+            <div>
+              <p className="font-bold text-white mb-1">Type</p>
+              <p className="capitalize">{event.event_type || 'Offline'}</p>
+            </div>
+          </div>
+          {event.location && (
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+                <MapPin size={20} />
+              </div>
+              <div>
+                <p className="font-bold text-white mb-1">Location</p>
+                <p>{event.location}</p>
+              </div>
+            </div>
+          )}
           {event.team_size > 1 && (
             <div className="flex items-start gap-3">
               <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
@@ -476,14 +530,39 @@ export default function EventDetails() {
           </p>
         </div>
 
+        {event.map_url && (
+          <div className="mb-10">
+            <h2 className="text-xl font-bold mb-4 text-white">Location Map</h2>
+            <div className="w-full h-64 md:h-80 rounded-2xl overflow-hidden border border-surface-border shadow-md">
+              <iframe 
+                src={event.map_url} 
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen={true} 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        )}
+
         {event.faq && event.faq.length > 0 && (
           <div className="mb-10">
             <h2 className="text-xl font-bold mb-4 text-white">Frequently Asked Questions</h2>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {event.faq.map((f: any, idx: number) => (
-                <div key={idx} className="bg-surface/50 border border-surface-border rounded-xl p-4">
-                  <h3 className="font-bold text-white mb-2">{f.question}</h3>
-                  <p className="text-gray-400 text-sm">{f.answer}</p>
+                <div key={idx} className="bg-surface/30 border border-surface-border rounded-xl overflow-hidden transition-all duration-300">
+                  <button 
+                    onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
+                    className="w-full flex justify-between items-center p-4 text-left font-bold text-white hover:bg-surface/50 transition-colors"
+                  >
+                    {f.question}
+                    {openFaqIndex === idx ? <ChevronUp size={20} className="text-accent-green flex-shrink-0" /> : <ChevronDown size={20} className="text-gray-500 flex-shrink-0" />}
+                  </button>
+                  <div className={`px-4 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === idx ? 'max-h-96 pb-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <p className="text-gray-400 text-sm border-t border-surface-border/50 pt-3">{f.answer}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -840,6 +919,136 @@ export default function EventDetails() {
                   onChange={(e) => setEditForm({...editForm, description: e.target.value})}
                   required
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Event Type</label>
+                  <select
+                    className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                    value={editForm.event_type}
+                    onChange={(e) => setEditForm({...editForm, event_type: e.target.value})}
+                  >
+                    <option value="offline">Offline / In-Person</option>
+                    <option value="online">Online / Virtual</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Location / Platform</label>
+                  <input
+                    type="text"
+                    className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                    value={editForm.location}
+                    onChange={(e) => setEditForm({...editForm, location: e.target.value})}
+                  />
+                </div>
+              </div>
+              
+              {editForm.event_type === 'offline' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Map Embed URL (Optional)</label>
+                  <input
+                    type="url"
+                    className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                    value={editForm.map_url}
+                    onChange={(e) => setEditForm({...editForm, map_url: e.target.value})}
+                  />
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Team Size</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                    value={editForm.team_size}
+                    onChange={(e) => setEditForm({...editForm, team_size: parseInt(e.target.value)})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Prize Pool</label>
+                  <input
+                    type="text"
+                    className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                    value={editForm.prize_pool}
+                    onChange={(e) => setEditForm({...editForm, prize_pool: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">External Link</label>
+                  <input
+                    type="url"
+                    className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                    value={editForm.external_link}
+                    onChange={(e) => setEditForm({...editForm, external_link: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">New Poster Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="w-full bg-surface border border-surface-border rounded-lg p-2 text-white focus:outline-none focus:border-accent-green transition-colors text-sm"
+                    onChange={(e) => setEditPosterFile(e.target.files?.[0] || null)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">New Banner Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="w-full bg-surface border border-surface-border rounded-lg p-2 text-white focus:outline-none focus:border-accent-green transition-colors text-sm"
+                    onChange={(e) => setEditBannerFile(e.target.files?.[0] || null)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2 mt-4">
+                  <label className="block text-sm font-medium text-gray-400">FAQs</label>
+                  <button type="button" onClick={() => setEditForm({...editForm, faq: [...(editForm.faq || []), { question: "", answer: "" }]})} className="text-xs text-accent-green border border-accent-green rounded px-2 py-1 hover:bg-accent-green hover:text-black transition-colors">
+                    + Add FAQ
+                  </button>
+                </div>
+                {(!editForm.faq || editForm.faq.length === 0) && <p className="text-sm text-gray-500 mb-4">No FAQs added.</p>}
+                {editForm.faq && editForm.faq.map((f: any, index: number) => (
+                  <div key={index} className="flex flex-col gap-2 p-4 mb-3 border border-surface-border rounded-lg bg-surface/50">
+                    <input
+                      type="text"
+                      placeholder="Question"
+                      className="w-full bg-surface border border-surface-border rounded-lg p-2 text-white focus:outline-none text-sm"
+                      value={f.question}
+                      onChange={(e) => {
+                        const newFaq = [...editForm.faq];
+                        newFaq[index].question = e.target.value;
+                        setEditForm({...editForm, faq: newFaq});
+                      }}
+                      required
+                    />
+                    <textarea
+                      placeholder="Answer"
+                      className="w-full bg-surface border border-surface-border rounded-lg p-2 text-white focus:outline-none text-sm min-h-[60px]"
+                      value={f.answer}
+                      onChange={(e) => {
+                        const newFaq = [...editForm.faq];
+                        newFaq[index].answer = e.target.value;
+                        setEditForm({...editForm, faq: newFaq});
+                      }}
+                      required
+                    />
+                    <button type="button" onClick={() => {
+                      const newFaq = editForm.faq.filter((_: any, i: number) => i !== index);
+                      setEditForm({...editForm, faq: newFaq});
+                    }} className="text-red-400 text-xs self-end hover:underline">
+                      Remove FAQ
+                    </button>
+                  </div>
+                ))}
               </div>
 
               <div className="flex items-center gap-3 bg-surface p-3 rounded-lg border border-surface-border mt-2">

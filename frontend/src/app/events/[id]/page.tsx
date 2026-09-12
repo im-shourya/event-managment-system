@@ -396,7 +396,7 @@ export default function EventDetails() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-neon">Loading event...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-text-primary">Loading event...</div>;
   }
 
   if (!event) {
@@ -415,12 +415,9 @@ export default function EventDetails() {
     : 0;
 
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-5xl mx-auto flex flex-col justify-start relative animate-fade-in-up">
-      {/* Cinematic background light */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[300px] bg-accent-green/5 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
-
+    <div className="min-h-screen p-4 md:p-8 max-w-5xl mx-auto flex flex-col justify-start animate-fade-in-up">
       <div className="mb-8 flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-accent-green transition-colors w-fit">
+        <Link href="/" className="flex items-center gap-2 text-text-muted hover:text-accent-green transition-colors w-fit">
           <ArrowLeft size={16} /> Back to Dashboard
         </Link>
         {isAdmin && (
@@ -430,21 +427,19 @@ export default function EventDetails() {
         )}
       </div>
 
-      <div className="glass-card p-8 rounded-3xl w-full relative overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-accent-green/10 rounded-full blur-[80px] -z-10 translate-x-1/2 -translate-y-1/2"></div>
-        
+      <div className="card p-8 w-full mb-8">
         {event.banner_url && (
-          <img src={event.banner_url} alt="Event Banner" className="w-full h-48 md:h-64 object-cover rounded-2xl mb-8 border border-surface-border shadow-lg" />
+          <img src={event.banner_url} alt="Event Banner" className="w-full h-48 md:h-64 object-cover rounded-[12px] mb-8 border border-border" />
         )}
         
         <div className="flex flex-col md:flex-row md:items-center gap-6 mb-6">
           {event.poster_url && (
-            <img src={event.poster_url} alt="Event Poster" className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-2xl border border-surface-border shadow-md" />
+            <img src={event.poster_url} alt="Event Poster" className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-[12px] border border-border" />
           )}
           <div>
-            <h1 className="text-4xl font-extrabold text-neon mb-2">{event.title}</h1>
+            <h1 className="text-4xl font-bold text-text-primary mb-2">{event.title}</h1>
             <div className="flex gap-3 flex-wrap">
-              <span className={`text-xs uppercase font-bold px-3 py-1 rounded-full border w-fit inline-block ${
+              <span className={`text-[12px] uppercase font-bold px-3 py-1 rounded-md border w-fit inline-block ${
                 event.status === 'upcoming' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
                 event.status === 'ongoing' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' :
                 'bg-gray-500/10 text-gray-400 border-gray-500/30'
@@ -460,63 +455,63 @@ export default function EventDetails() {
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-8 text-sm text-gray-300 mb-8 pb-8 border-b border-surface-border flex-wrap">
+        <div className="flex flex-col sm:flex-row gap-8 text-[14px] text-text-secondary mb-8 pb-8 border-b border-border flex-wrap">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+            <div className="p-2 bg-surface-secondary rounded-[8px] text-accent-green border border-border">
               <Calendar size={20} />
             </div>
             <div>
-              <p className="font-bold text-white mb-1">Starts</p>
+              <p className="font-semibold text-text-primary mb-1">Starts</p>
               <p>{new Date(event.start_time).toLocaleString()}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+            <div className="p-2 bg-surface-secondary rounded-[8px] text-accent-green border border-border">
               <Clock size={20} />
             </div>
             <div>
-              <p className="font-bold text-white mb-1">Ends</p>
+              <p className="font-semibold text-text-primary mb-1">Ends</p>
               <p>{new Date(event.end_time).toLocaleString()}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+            <div className="p-2 bg-surface-secondary rounded-[8px] text-accent-green border border-border">
               {event.event_type === 'online' ? <Monitor size={20} /> : <Building size={20} />}
             </div>
             <div>
-              <p className="font-bold text-white mb-1">Type</p>
+              <p className="font-semibold text-text-primary mb-1">Type</p>
               <p className="capitalize">{event.event_type || 'Offline'}</p>
             </div>
           </div>
           {event.location && (
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+              <div className="p-2 bg-surface-secondary rounded-[8px] text-accent-green border border-border">
                 <MapPin size={20} />
               </div>
               <div>
-                <p className="font-bold text-white mb-1">Location</p>
+                <p className="font-semibold text-text-primary mb-1">Location</p>
                 <p>{event.location}</p>
               </div>
             </div>
           )}
           {event.team_size > 1 && (
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+              <div className="p-2 bg-surface-secondary rounded-[8px] text-accent-green border border-border">
                 <Users size={20} />
               </div>
               <div>
-                <p className="font-bold text-white mb-1">Team Size</p>
+                <p className="font-semibold text-text-primary mb-1">Team Size</p>
                 <p>{event.team_size} members</p>
               </div>
             </div>
           )}
           {event.external_link && (
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-surface rounded-lg text-accent-green border border-surface-border">
+              <div className="p-2 bg-surface-secondary rounded-[8px] text-accent-green border border-border">
                 <Globe size={20} />
               </div>
               <div>
-                <p className="font-bold text-white mb-1">Link</p>
+                <p className="font-semibold text-text-primary mb-1">Link</p>
                 <a href={event.external_link} target="_blank" rel="noreferrer" className="text-accent-green hover:underline break-all line-clamp-1">{event.external_link}</a>
               </div>
             </div>
@@ -524,16 +519,16 @@ export default function EventDetails() {
         </div>
 
         <div className="mb-10">
-          <h2 className="text-xl font-bold mb-4 text-white">About this event</h2>
-          <p className="text-gray-400 whitespace-pre-wrap leading-relaxed">
+          <h2 className="text-xl font-bold mb-4 text-text-primary">About this event</h2>
+          <p className="text-text-secondary whitespace-pre-wrap leading-relaxed">
             {event.description || "No description provided."}
           </p>
         </div>
 
         {event.map_url && (
           <div className="mb-10">
-            <h2 className="text-xl font-bold mb-4 text-white">Location Map</h2>
-            <div className="w-full h-64 md:h-80 rounded-2xl overflow-hidden border border-surface-border shadow-md">
+            <h2 className="text-xl font-bold mb-4 text-text-primary">Location Map</h2>
+            <div className="w-full h-64 md:h-80 rounded-[12px] overflow-hidden border border-border">
               <iframe 
                 src={event.map_url} 
                 width="100%" 
@@ -549,19 +544,19 @@ export default function EventDetails() {
 
         {event.faq && event.faq.length > 0 && (
           <div className="mb-10">
-            <h2 className="text-xl font-bold mb-4 text-white">Frequently Asked Questions</h2>
+            <h2 className="text-xl font-bold mb-4 text-text-primary">Frequently Asked Questions</h2>
             <div className="flex flex-col gap-3">
               {event.faq.map((f: any, idx: number) => (
-                <div key={idx} className="bg-surface/30 border border-surface-border rounded-xl overflow-hidden transition-all duration-300">
+                <div key={idx} className="bg-surface-secondary border border-border rounded-xl overflow-hidden transition-all duration-300">
                   <button 
                     onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-                    className="w-full flex justify-between items-center p-4 text-left font-bold text-white hover:bg-surface/50 transition-colors"
+                    className="w-full flex justify-between items-center p-4 text-left font-bold text-text-primary hover:bg-surface-hover transition-colors"
                   >
                     {f.question}
-                    {openFaqIndex === idx ? <ChevronUp size={20} className="text-accent-green flex-shrink-0" /> : <ChevronDown size={20} className="text-gray-500 flex-shrink-0" />}
+                    {openFaqIndex === idx ? <ChevronUp size={20} className="text-accent-green flex-shrink-0" /> : <ChevronDown size={20} className="text-text-muted flex-shrink-0" />}
                   </button>
                   <div className={`px-4 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === idx ? 'max-h-96 pb-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <p className="text-gray-400 text-sm border-t border-surface-border/50 pt-3">{f.answer}</p>
+                    <p className="text-text-secondary text-sm border-t border-border pt-3">{f.answer}</p>
                   </div>
                 </div>
               ))}
@@ -599,10 +594,10 @@ export default function EventDetails() {
             </button>
 
             {isAlreadyRegistered && myQrCodeUrl && (
-              <div className="mt-8 p-6 bg-surface border border-surface-border rounded-2xl flex flex-col items-center text-center w-full max-w-sm mx-auto shadow-[0_0_20px_rgba(0,230,118,0.1)]">
-                <h3 className="text-lg font-bold text-white mb-2">Your Check-In QR Pass</h3>
-                <p className="text-gray-400 text-sm mb-4">Show this code at the event entrance.</p>
-                <div className="bg-white p-2 rounded-xl">
+              <div className="mt-8 p-6 bg-surface-elevated border border-border rounded-[12px] flex flex-col items-center text-center w-full max-w-sm mx-auto">
+                <h3 className="text-lg font-bold text-text-primary mb-2">Your Check-In QR Pass</h3>
+                <p className="text-text-secondary text-sm mb-4">Show this code at the event entrance.</p>
+                <div className="bg-white p-2 rounded-[8px]">
                   <img src={myQrCodeUrl} alt="Check-In QR" className="w-48 h-48" />
                 </div>
               </div>
@@ -613,19 +608,19 @@ export default function EventDetails() {
 
       {/* STUDENT FEEDBACK SECTION */}
       {!isAdmin && isMarkedPresent && event.status === 'completed' && (
-        <div className="glass-card p-8 rounded-3xl w-full border border-surface-border relative mb-8">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-2">
+        <div className="card p-8 w-full mb-8">
+          <h2 className="text-2xl font-bold text-text-primary flex items-center gap-2 mb-2">
             <Star size={24} className="text-accent-green" /> Event Feedback
           </h2>
           {hasSubmittedFeedback ? (
-            <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-lg flex items-center gap-2">
+            <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-lg flex items-center gap-2 mt-4">
               <CheckCircle size={20} /> Thank you for your feedback!
             </div>
           ) : (
             <form onSubmit={handleFeedbackSubmit} className="mt-6 flex flex-col gap-4">
-              <p className="text-gray-400 text-sm">We'd love to hear your thoughts on this event.</p>
+              <p className="text-text-muted text-sm">We'd love to hear your thoughts on this event.</p>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Rating (1-5)</label>
+                <label className="block text-sm font-medium text-text-muted mb-2">Rating (1-5)</label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map(star => (
                     <button 
@@ -640,7 +635,7 @@ export default function EventDetails() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Comments</label>
+                <label className="block text-sm font-medium text-text-muted mb-2">Comments</label>
                 <textarea
                   className="premium-input min-h-[100px]"
                   value={feedbackComments}
@@ -661,43 +656,43 @@ export default function EventDetails() {
         <div className="w-full mb-12">
           
           {/* Admin Tabs */}
-          <div className="flex gap-4 border-b border-surface-border mb-6">
+          <div className="flex gap-4 border-b border-border mb-6">
             <button 
               onClick={() => setAdminTab("registrations")}
-              className={`pb-4 px-2 font-bold transition-colors ${adminTab === 'registrations' ? 'text-accent-green border-b-2 border-accent-green' : 'text-gray-500 hover:text-gray-300'}`}
+              className={`pb-4 px-2 font-bold transition-colors ${adminTab === 'registrations' ? 'text-accent-green border-b-2 border-accent-green' : 'text-text-muted hover:text-text-primary'}`}
             >
               Registrations
             </button>
             <button 
               onClick={() => setAdminTab("feedback")}
-              className={`pb-4 px-2 font-bold transition-colors flex items-center gap-2 ${adminTab === 'feedback' ? 'text-accent-green border-b-2 border-accent-green' : 'text-gray-500 hover:text-gray-300'}`}
+              className={`pb-4 px-2 font-bold transition-colors flex items-center gap-2 ${adminTab === 'feedback' ? 'text-accent-green border-b-2 border-accent-green' : 'text-text-muted hover:text-text-primary'}`}
             >
-              Feedback <span className="bg-surface px-2 py-0.5 rounded-full text-xs">{feedbacks.length}</span>
+              Feedback <span className="bg-surface-secondary px-2 py-0.5 rounded-[4px] text-xs text-text-secondary border border-border">{feedbacks.length}</span>
             </button>
           </div>
 
           {adminTab === "registrations" ? (
             <>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
-                <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+                <h2 className="text-3xl font-bold text-text-primary flex items-center gap-3">
                   <Users size={28} className="text-accent-green" /> Analytics
                 </h2>
                 <div className="flex gap-3">
                   <button 
                     onClick={() => setIsMailModalOpen(true)}
-                    className="btn-primary text-sm flex items-center gap-2 py-2 px-4 bg-accent-green text-black hover:bg-accent-green/90"
+                    className="btn-primary text-[14px]"
                   >
                     <Mail size={16} /> Send Mass Email
                   </button>
                   <button 
                     onClick={() => setQrModalData({ registrationId: 'ALL' })}
-                    className="btn-outline text-sm flex items-center gap-2 py-2 px-4 border-accent-green text-accent-green hover:bg-accent-green hover:text-black"
+                    className="btn-outline text-[14px]"
                   >
                     <QrCode size={16} /> Generate All QRs
                   </button>
                   <button 
                     onClick={downloadCSV}
-                    className="btn-outline text-sm flex items-center gap-2 py-2 px-4"
+                    className="btn-outline text-[14px]"
                   >
                     <Download size={16} /> Download {filter === "all" ? "All" : "Present"} (CSV)
                   </button>
@@ -707,68 +702,71 @@ export default function EventDetails() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 <div 
                   onClick={() => setFilter("all")}
-                  className={`glass-card p-6 rounded-2xl cursor-pointer border-2 transition-all group ${filter === 'all' ? 'border-accent-green shadow-[0_0_15px_rgba(0,230,118,0.2)]' : 'border-transparent hover:border-surface-border'}`}
+                  className={`card p-6 cursor-pointer border-2 transition-colors group ${filter === 'all' ? 'border-accent-green' : 'border-transparent hover:border-border-strong'}`}
                 >
-                  <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-300 group-hover:text-white transition-colors">
+                  <h3 className="text-[14px] font-semibold mb-2 flex items-center gap-2 text-text-secondary group-hover:text-text-primary transition-colors uppercase tracking-wider">
                     <Users size={18} className={filter === 'all' ? 'text-accent-green' : ''} /> 
                     Total Registrations
                   </h3>
-                  <p className="text-5xl font-extrabold text-white mt-4">{totalRegistrations}</p>
+                  <p className="text-5xl font-bold text-text-primary mt-4">{totalRegistrations}</p>
                 </div>
                 
                 <div 
                   onClick={() => setFilter("present")}
-                  className={`glass-card p-6 rounded-2xl cursor-pointer border-2 transition-all group ${filter === 'present' ? 'border-accent-green shadow-[0_0_15px_rgba(0,230,118,0.2)]' : 'border-transparent hover:border-surface-border'}`}
+                  className={`card p-6 cursor-pointer border-2 transition-colors group ${filter === 'present' ? 'border-accent-green' : 'border-transparent hover:border-border-strong'}`}
                 >
-                  <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-gray-300 group-hover:text-white transition-colors">
+                  <h3 className="text-[14px] font-semibold mb-2 flex items-center gap-2 text-text-secondary group-hover:text-text-primary transition-colors uppercase tracking-wider">
                     <CheckCircle size={18} className={filter === 'present' ? 'text-accent-green' : ''} /> 
                     Total Present
                   </h3>
-                  <p className="text-5xl font-extrabold text-white mt-4">{totalPresent}</p>
+                  <p className="text-5xl font-bold text-text-primary mt-4">{totalPresent}</p>
                 </div>
               </div>
               
-              <div className="glass-card p-8 rounded-3xl w-full border border-surface-border relative">
-                <h3 className="text-xl font-bold text-white mb-6">
+              <div className="card p-8 w-full relative">
+                <h3 className="text-xl font-bold text-text-primary mb-6">
                   {filter === "all" ? "All Registered Participants" : "Attendees Marked Present"}
                 </h3>
 
                 {filteredRegistrations.length === 0 ? (
-                  <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-surface-border rounded-xl">
-                    <Users size={48} className="text-gray-600 mb-4" />
-                    <p className="text-gray-400 text-lg">No participants found in this category.</p>
+                  <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl">
+                    <Users size={48} className="text-text-muted mb-4" />
+                    <p className="text-text-secondary text-lg">No participants found in this category.</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto rounded-xl border border-surface-border">
+                  <div className="overflow-x-auto rounded-[8px] border border-border">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-surface/50 border-b border-surface-border">
-                          <th className="py-4 px-6 font-bold text-gray-300">Participant</th>
-                          <th className="py-4 px-6 font-bold text-gray-300">Details</th>
-                          <th className="py-4 px-6 font-bold text-gray-300">Status</th>
+                        <tr className="bg-surface-elevated border-b border-border">
+                          <th className="py-4 px-6 font-semibold text-[14px] text-text-secondary">Participant</th>
+                          <th className="py-4 px-6 font-semibold text-[14px] text-text-secondary">Details</th>
+                          <th className="py-4 px-6 font-semibold text-[14px] text-text-secondary">Status</th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredRegistrations.map((reg) => (
-                          <tr key={reg.id} className="border-b border-surface-border/50 hover:bg-white/5 transition-colors">
-                            <td className="py-4 px-6 text-white font-medium">
+                          <tr key={reg.id} className="border-b border-border hover:bg-surface-hover transition-colors">
+                            <td className="py-4 px-6 text-text-primary font-medium">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-accent-green/20 text-accent-green flex items-center justify-center font-bold text-sm uppercase flex-shrink-0">
+                                <div className="w-10 h-10 rounded-full bg-surface-elevated border border-border text-accent-green flex items-center justify-center font-bold text-sm uppercase flex-shrink-0">
                                   {(reg.users?.name || "U").charAt(0)}
                                 </div>
                                 <div>
                                   <p>{reg.users?.name || "Unknown"}</p>
-                                  <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                                  <div className="flex items-center gap-1 text-[12px] text-text-muted mt-1">
                                     <Mail size={12} /> {reg.users?.email}
                                   </div>
                                 </div>
                               </div>
                             </td>
-                            <td className="py-4 px-6 text-gray-400 text-sm">
+                            <td className="py-4 px-6 text-text-secondary text-[13px]">
                               <div className="flex flex-col gap-1">
-                                <span className="flex items-center gap-2" title="Register Number"><Hash size={14} className="text-gray-500"/> {reg.users?.register_number || "-"}</span>
-                                <span className="flex items-center gap-2" title="Year & Dept"><BookOpen size={14} className="text-gray-500"/> {reg.users?.year || "-"} • {reg.users?.department || "-"}</span>
-                                <span className="flex items-center gap-2" title="College"><Building size={14} className="text-gray-500"/> {reg.users?.college || "-"}</span>
+                                <span className="flex items-center gap-2" title="Register Number">
+                                  <Hash size={14} className="text-text-muted"/> 
+                                  <span className="font-mono">{reg.users?.register_number || "-"}</span>
+                                </span>
+                                <span className="flex items-center gap-2" title="Year & Dept"><BookOpen size={14} className="text-text-muted"/> {reg.users?.year || "-"} • {reg.users?.department || "-"}</span>
+                                <span className="flex items-center gap-2" title="College"><Building size={14} className="text-text-muted"/> {reg.users?.college || "-"}</span>
                               </div>
                             </td>
                             <td className="py-4 px-6">
@@ -807,14 +805,14 @@ export default function EventDetails() {
               </div>
             </>
           ) : (
-            <div className="glass-card p-8 rounded-3xl w-full border border-surface-border">
-              <div className="flex items-center justify-between mb-8 pb-8 border-b border-surface-border">
+            <div className="card p-8 w-full">
+              <div className="flex items-center justify-between mb-8 pb-8 border-b border-border">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Participant Feedback</h3>
-                  <p className="text-gray-400 text-sm">Reviews from students who attended the event.</p>
+                  <h3 className="text-2xl font-bold text-text-primary mb-2">Participant Feedback</h3>
+                  <p className="text-text-secondary text-[14px]">Reviews from students who attended the event.</p>
                 </div>
-                <div className="text-center bg-surface p-4 rounded-2xl border border-surface-border min-w-[120px]">
-                  <p className="text-gray-400 text-xs uppercase font-bold mb-1">Average Rating</p>
+                <div className="text-center bg-surface-secondary p-4 rounded-[12px] border border-border min-w-[120px]">
+                  <p className="text-text-muted text-[12px] uppercase font-bold mb-1">Average Rating</p>
                   <p className="text-4xl font-extrabold text-yellow-400 flex items-center justify-center gap-1">
                     {averageRating} <Star size={24} fill="currentColor" />
                   </p>
@@ -822,26 +820,26 @@ export default function EventDetails() {
               </div>
 
               {feedbacks.length === 0 ? (
-                <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-surface-border rounded-xl">
-                  <MessageSquare size={48} className="text-gray-600 mb-4" />
-                  <p className="text-gray-400 text-lg">No feedback received yet.</p>
+                <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl">
+                  <MessageSquare size={48} className="text-text-muted mb-4" />
+                  <p className="text-text-secondary text-lg">No feedback received yet.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {feedbacks.map(fb => (
-                    <div key={fb.id} className="bg-surface/50 p-6 rounded-2xl border border-surface-border">
+                    <div key={fb.id} className="bg-surface-elevated p-6 rounded-[12px] border border-border">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <p className="text-white font-bold">{fb.users?.name || "Anonymous"}</p>
-                          <p className="text-xs text-gray-500">{new Date(fb.created_at).toLocaleDateString()}</p>
+                          <p className="text-text-primary font-bold">{fb.users?.name || "Anonymous"}</p>
+                          <p className="text-[12px] text-text-muted">{new Date(fb.created_at).toLocaleDateString()}</p>
                         </div>
                         <div className="flex text-yellow-400">
                           {[...Array(5)].map((_, i) => (
-                            <Star key={i} size={14} fill={i < fb.rating ? "currentColor" : "none"} className={i < fb.rating ? "" : "text-gray-600"} />
+                            <Star key={i} size={14} fill={i < fb.rating ? "currentColor" : "none"} className={i < fb.rating ? "" : "text-border-strong"} />
                           ))}
                         </div>
                       </div>
-                      <p className="text-gray-300 text-sm italic">"{fb.comments || "No written comments."}"</p>
+                      <p className="text-text-secondary text-[14px] italic">"{fb.comments || "No written comments."}"</p>
                     </div>
                   ))}
                 </div>

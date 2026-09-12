@@ -5,6 +5,7 @@ yarn-error.log
 
 # Next.js
 .next/
+.agents/
 out/
 build/
 

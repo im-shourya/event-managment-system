@@ -36,23 +36,23 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="glass-card p-8 max-w-md w-full rounded-3xl">
-        <h2 className="text-3xl font-bold text-center mb-8">
+      <div className="card p-8 max-w-md w-full border border-border">
+        <h2 className="text-3xl font-bold text-center mb-8 text-text-primary">
           {isLogin ? "Welcome Back" : "Create Account"}
         </h2>
         
         {error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-200 p-3 rounded-lg mb-6 text-sm text-center">
+          <div className="bg-error/10 border border-error text-error p-3 rounded-[8px] mb-6 text-[14px] text-center">
             {error}
           </div>
         )}
 
         <form onSubmit={handleAuth} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
+            <label className="block text-[14px] font-medium text-text-muted mb-1">Email</label>
             <input
               type="email"
-              className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+              className="premium-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -60,16 +60,16 @@ export default function Login() {
           </div>
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-sm font-medium text-gray-400">Password</label>
+              <label className="block text-[14px] font-medium text-text-muted">Password</label>
               {isLogin && (
-                <Link href="/reset-password" className="text-xs text-accent-green hover:underline">
+                <Link href="/reset-password" className="text-[12px] text-accent-green hover:underline">
                   Forgot Password?
                 </Link>
               )}
             </div>
             <input
               type="password"
-              className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+              className="premium-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -81,7 +81,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-400">
+        <div className="mt-6 text-center text-[14px] text-text-secondary">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button 
             type="button" 

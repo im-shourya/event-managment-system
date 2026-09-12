@@ -47,22 +47,20 @@ export default function UpdatePassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="glass-card p-10 max-w-md w-full rounded-3xl relative overflow-hidden border border-surface-border">
+      <div className="card p-10 max-w-md w-full border border-border">
         
-        <div className="absolute top-0 right-0 w-64 h-64 bg-accent-green/10 rounded-full blur-[80px] -z-10 translate-x-1/2 -translate-y-1/2"></div>
-
-        <h2 className="text-3xl font-bold mb-2 flex items-center gap-3 text-white">
+        <h2 className="text-3xl font-bold mb-2 flex items-center gap-3 text-text-primary">
           <KeyRound className="text-accent-green" size={28} />
           Create New Password
         </h2>
-        <p className="text-gray-400 mb-8">
+        <p className="text-text-secondary text-[14px] mb-8">
           Enter your new password below. Make it a strong one!
         </p>
 
         {message && (
-          <div className={`p-4 rounded-lg mb-6 text-sm ${
-            message.type === 'error' ? 'bg-red-500/20 text-red-200 border border-red-500' : 
-            'bg-green-500/20 text-green-200 border border-green-500'
+          <div className={`p-4 rounded-[8px] mb-6 text-[14px] ${
+            message.type === 'error' ? 'bg-error/10 text-error border border-error' : 
+            'bg-success/10 text-success border border-success'
           }`}>
             {message.text}
           </div>
@@ -70,12 +68,12 @@ export default function UpdatePassword() {
 
         <form onSubmit={handleUpdatePassword} className="flex flex-col gap-5">
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
+            <label className="block text-[14px] font-medium text-text-muted mb-1 flex items-center gap-2">
               <Lock size={16} /> New Password
             </label>
             <input
               type="password"
-              className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+              className="premium-input"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password"

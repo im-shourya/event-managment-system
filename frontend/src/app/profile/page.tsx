@@ -76,41 +76,39 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-neon">Loading profile...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-text-primary">Loading profile...</div>;
   }
 
   return (
     <div className="min-h-screen p-8 max-w-2xl mx-auto flex flex-col justify-start">
       <div className="mb-8">
-        <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-accent-green transition-colors w-fit">
+        <Link href="/" className="flex items-center gap-2 text-text-muted hover:text-accent-green transition-colors w-fit">
           <ArrowLeft size={16} /> Back to Dashboard
         </Link>
       </div>
 
-      <div className="glass-card p-8 rounded-3xl w-full relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-accent-green/10 rounded-full blur-[80px] -z-10 translate-x-1/2 -translate-y-1/2"></div>
-        
-        <h1 className="text-3xl font-extrabold text-neon mb-2 flex items-center gap-3">
+      <div className="card p-8 w-full border border-border">
+        <h1 className="text-3xl font-bold text-text-primary mb-2 flex items-center gap-3">
           <User size={28} /> My Profile
         </h1>
-        <p className="text-gray-400 mb-8 pb-6 border-b border-surface-border">
+        <p className="text-text-secondary text-[14px] mb-8 pb-6 border-b border-border">
           Complete your profile to register for events. All fields are required.
         </p>
 
         {message && (
-          <div className={`p-4 rounded-lg mb-6 text-sm ${message.type === 'error' ? 'bg-red-500/20 text-red-200 border border-red-500' : 'bg-green-500/20 text-green-200 border border-green-500'}`}>
+          <div className={`p-4 rounded-[8px] mb-6 text-[14px] ${message.type === 'error' ? 'bg-error/10 text-error border border-error' : 'bg-success/10 text-success border border-success'}`}>
             {message.text}
           </div>
         )}
 
         <form onSubmit={handleSave} className="flex flex-col gap-5">
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
+            <label className="block text-[14px] font-medium text-text-muted mb-1 flex items-center gap-2">
                Full Name
             </label>
             <input
               type="text"
-              className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+              className="premium-input"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -118,12 +116,12 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
+            <label className="block text-[14px] font-medium text-text-muted mb-1 flex items-center gap-2">
               <Hash size={16}/> Registration Number / Roll Number
             </label>
             <input
               type="text"
-              className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+              className="premium-input font-mono"
               value={registerNumber}
               onChange={(e) => setRegisterNumber(e.target.value)}
               placeholder="e.g. 21BCE1234"
@@ -133,11 +131,11 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
+              <label className="block text-[14px] font-medium text-text-muted mb-1 flex items-center gap-2">
                 <GraduationCap size={16}/> Year of Study
               </label>
               <select
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                className="premium-input"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 required
@@ -152,12 +150,12 @@ export default function ProfilePage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
+              <label className="block text-[14px] font-medium text-text-muted mb-1 flex items-center gap-2">
                 <BookOpen size={16}/> Department
               </label>
               <input
                 type="text"
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                className="premium-input"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
                 placeholder="e.g. Computer Science"
@@ -167,12 +165,12 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
+            <label className="block text-[14px] font-medium text-text-muted mb-1 flex items-center gap-2">
               <Building size={16}/> College / University
             </label>
             <input
               type="text"
-              className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+              className="premium-input"
               value={college}
               onChange={(e) => setCollege(e.target.value)}
               placeholder="e.g. Example Institute of Technology"

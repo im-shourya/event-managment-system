@@ -142,22 +142,22 @@ export default function CreateEvent() {
   };
 
   if (!user) {
-    return <div className="min-h-screen flex items-center justify-center text-neon">Checking permissions...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-text-primary">Checking permissions...</div>;
   }
 
   return (
     <div className="min-h-screen p-8 max-w-3xl mx-auto flex flex-col justify-center my-12">
       <div className="mb-8">
-        <Link href="/events" className="text-gray-400 hover:text-accent-green transition-colors">
+        <Link href="/events" className="text-text-muted hover:text-accent-green transition-colors">
           &larr; Back to Events
         </Link>
       </div>
 
-      <div className="glass-card p-8 rounded-3xl w-full">
-        <h1 className="text-3xl font-bold mb-8">Create New Event</h1>
+      <div className="card p-8 w-full">
+        <h1 className="text-3xl font-bold mb-8 text-text-primary">Create New Event</h1>
         
         {error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-200 p-3 rounded-lg mb-6 text-sm text-center">
+          <div className="bg-error/10 border border-error text-error p-3 rounded-lg mb-6 text-[14px] text-center">
             {error}
           </div>
         )}
@@ -165,13 +165,13 @@ export default function CreateEvent() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
           
           {/* Basic Info */}
-          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
-            <h2 className="text-xl font-bold text-neon mb-2">1. Basic Info</h2>
+          <div className="flex flex-col gap-5 border border-border p-6 rounded-[12px] bg-surface-secondary">
+            <h2 className="text-xl font-bold text-text-primary mb-2">1. Basic Info</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Event Title</label>
+              <label className="block text-[14px] font-medium text-text-muted mb-1">Event Title</label>
               <input
                 type="text"
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                className="premium-input"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -179,9 +179,9 @@ export default function CreateEvent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
+              <label className="block text-[14px] font-medium text-text-muted mb-1">Description</label>
               <textarea
-                className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors min-h-[100px]"
+                className="premium-input min-h-[100px]"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
@@ -190,20 +190,20 @@ export default function CreateEvent() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Start Time</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">Start Time</label>
                 <input
                   type="datetime-local"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="premium-input"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">End Time</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">End Time</label>
                 <input
                   type="datetime-local"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="premium-input"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
                   required
@@ -213,13 +213,13 @@ export default function CreateEvent() {
           </div>
 
           {/* Logistics */}
-          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
-            <h2 className="text-xl font-bold text-neon mb-2">2. Logistics</h2>
+          <div className="flex flex-col gap-5 border border-border p-6 rounded-[12px] bg-surface-secondary">
+            <h2 className="text-xl font-bold text-text-primary mb-2">2. Logistics</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Event Type</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">Event Type</label>
                 <select
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="premium-input"
                   value={eventType}
                   onChange={(e) => setEventType(e.target.value)}
                 >
@@ -228,10 +228,10 @@ export default function CreateEvent() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Location / Platform</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">Location / Platform</label>
                 <input
                   type="text"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="premium-input"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder={eventType === 'offline' ? "e.g., Main Auditorium" : "e.g., Zoom"}
@@ -240,48 +240,48 @@ export default function CreateEvent() {
             </div>
             {eventType === 'offline' && (
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Map Embed URL (Optional)</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">Map Embed URL (Optional)</label>
                 <input
                   type="url"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="premium-input"
                   value={mapUrl}
                   onChange={(e) => setMapUrl(e.target.value)}
                   placeholder="https://www.google.com/maps/embed?..."
                 />
-                <p className="text-xs text-gray-500 mt-1">Provide an embed URL (src) to display a map on the event page.</p>
+                <p className="text-[12px] text-text-secondary mt-1">Provide an embed URL (src) to display a map on the event page.</p>
               </div>
             )}
           </div>
 
           {/* Additional Details */}
-          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
-            <h2 className="text-xl font-bold text-neon mb-2">3. Additional Details</h2>
+          <div className="flex flex-col gap-5 border border-border p-6 rounded-[12px] bg-surface-secondary">
+            <h2 className="text-xl font-bold text-text-primary mb-2">3. Additional Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Team Size</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">Team Size</label>
                 <input
                   type="number"
                   min="1"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="premium-input"
                   value={teamSize}
                   onChange={(e) => setTeamSize(parseInt(e.target.value))}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Prize Pool (Optional)</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">Prize Pool (Optional)</label>
                 <input
                   type="text"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="premium-input"
                   value={prizePool}
                   onChange={(e) => setPrizePool(e.target.value)}
                   placeholder="e.g., ₹10,000"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">External Link (Optional)</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">External Link (Optional)</label>
                 <input
                   type="url"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="premium-input"
                   value={externalLink}
                   onChange={(e) => setExternalLink(e.target.value)}
                   placeholder="https://"
@@ -291,24 +291,24 @@ export default function CreateEvent() {
           </div>
 
           {/* Media */}
-          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
-            <h2 className="text-xl font-bold text-neon mb-2">4. Media</h2>
+          <div className="flex flex-col gap-5 border border-border p-6 rounded-[12px] bg-surface-secondary">
+            <h2 className="text-xl font-bold text-text-primary mb-2">4. Media</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Poster Image</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">Poster Image</label>
                 <input
                   type="file"
                   accept="image/*"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="w-full text-[14px] text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-surface-elevated file:text-text-primary hover:file:bg-surface-hover file:transition-colors cursor-pointer"
                   onChange={(e) => setPosterFile(e.target.files?.[0] || null)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Banner Image</label>
+                <label className="block text-[14px] font-medium text-text-muted mb-1">Banner Image</label>
                 <input
                   type="file"
                   accept="image/*"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-3 text-white focus:outline-none focus:border-accent-green transition-colors"
+                  className="w-full text-[14px] text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-surface-elevated file:text-text-primary hover:file:bg-surface-hover file:transition-colors cursor-pointer"
                   onChange={(e) => setBannerFile(e.target.files?.[0] || null)}
                 />
               </div>
@@ -316,32 +316,32 @@ export default function CreateEvent() {
           </div>
 
           {/* FAQs */}
-          <div className="flex flex-col gap-5 border border-surface-border p-6 rounded-2xl bg-surface/20">
+          <div className="flex flex-col gap-5 border border-border p-6 rounded-[12px] bg-surface-secondary">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-bold text-neon">5. FAQs</h2>
-              <button type="button" onClick={handleAddFaq} className="text-xs text-accent-green border border-accent-green rounded px-2 py-1 hover:bg-accent-green hover:text-black transition-colors">
+              <h2 className="text-xl font-bold text-text-primary">5. FAQs</h2>
+              <button type="button" onClick={handleAddFaq} className="text-[12px] text-accent-green border border-accent-green rounded px-2 py-1 hover:bg-accent-green hover:text-black transition-colors font-medium">
                 + Add FAQ
               </button>
             </div>
-            {faqs.length === 0 && <p className="text-sm text-gray-500">No FAQs added.</p>}
+            {faqs.length === 0 && <p className="text-[14px] text-text-secondary">No FAQs added.</p>}
             {faqs.map((faq, index) => (
-              <div key={index} className="flex flex-col gap-2 p-4 border border-surface-border rounded-lg bg-surface/50">
+              <div key={index} className="flex flex-col gap-2 p-4 border border-border rounded-lg bg-surface-elevated">
                 <input
                   type="text"
                   placeholder="Question"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-2 text-white focus:outline-none text-sm"
+                  className="premium-input"
                   value={faq.question}
                   onChange={(e) => handleUpdateFaq(index, "question", e.target.value)}
                   required
                 />
                 <textarea
                   placeholder="Answer"
-                  className="w-full bg-surface border border-surface-border rounded-lg p-2 text-white focus:outline-none text-sm min-h-[60px]"
+                  className="premium-input min-h-[60px]"
                   value={faq.answer}
                   onChange={(e) => handleUpdateFaq(index, "answer", e.target.value)}
                   required
                 />
-                <button type="button" onClick={() => handleRemoveFaq(index)} className="text-red-400 text-xs self-end hover:underline">
+                <button type="button" onClick={() => handleRemoveFaq(index)} className="text-error text-[12px] self-end hover:underline">
                   Remove FAQ
                 </button>
               </div>
